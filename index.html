@@ -9,13 +9,13 @@
 <body>
 
   <header class="topbar">
-    <div class="brand">
+    <button id="btn-brand-home" class="brand" title="Retour à l'accueil">
       <span class="brand-emoji">🎓</span>
       <div>
         <h1>Réviser le droit de l'apprentissage</h1>
         <p class="subtitle">Brevet de Maîtrise · Recruter, accueillir et former un apprenti, un alternant</p>
       </div>
-    </div>
+    </button>
     <nav class="tabs">
       <button class="tab" data-screen="screen-quiz">🎯 Quiz</button>
       <button class="tab" data-screen="screen-flash">🃏 Flashcards</button>
@@ -40,13 +40,15 @@
         </div>
         <h3 class="choose-title">Choisissez une thématique :</h3>
         <div id="quiz-themes" class="theme-grid"></div>
-        <div class="center">
+        <div class="center btn-row">
           <button id="btn-start-quiz" class="btn-primary">🚀 Lancer un quiz</button>
+          <button id="btn-resume-quiz" class="btn-ghost" hidden>▶️ Reprendre le quiz en cours</button>
         </div>
       </div>
 
       <div id="quiz-play" class="panel" hidden>
         <div class="quiz-meta">
+          <button id="btn-quiz-quit" class="btn-mini" title="Revenir à l'accueil sans perdre la partie">🏠 Accueil</button>
           <span id="quiz-counter" class="pill">Question 1 / 10</span>
           <span id="quiz-theme" class="pill pill-theme"></span>
           <span id="quiz-score" class="pill pill-score">⭐ 0</span>
@@ -84,13 +86,15 @@
         </div>
         <h3 class="choose-title">Choisissez une thématique :</h3>
         <div id="flash-themes" class="theme-grid"></div>
-        <div class="center">
+        <div class="center btn-row">
           <button id="btn-start-flash" class="btn-primary">🃏 Lancer une session</button>
+          <button id="btn-resume-flash" class="btn-ghost" hidden>▶️ Reprendre la session</button>
         </div>
       </div>
 
       <div id="flash-play" class="panel center" hidden>
         <div class="quiz-meta">
+          <button id="btn-flash-quit" class="btn-mini" title="Revenir à l'accueil sans perdre la session">🏠 Accueil</button>
           <span id="flash-counter" class="pill">Carte 1 / 8</span>
           <span id="flash-box" class="pill pill-theme">Boîte 1</span>
         </div>

@@ -184,19 +184,49 @@
     MODULES.forEach(m => mkChip(m.id, m.emoji, m.titre, countOf(m.id)));
   }
 
-  // ---------- Navigation entre les modes ----------
+  // ---------- Navigation entre les modes (routage par #hash) ----------
+  // Le bouton « précédent » du navigateur permet ainsi de revenir en arrière,
+  // et chaque onglet a une adresse directe (ex. monsite.com/#fiches).
   const screens = document.querySelectorAll(".screen");
   const tabs = document.querySelectorAll(".tab");
+
+  const HASH_TO_SCREEN = {
+    "#quiz": "screen-quiz",
+    "#cartes": "screen-flash",
+    "#fiches": "screen-fiches",
+    "#progression": "screen-progress"
+  };
+  const SCREEN_TO_HASH = {};
+  Object.keys(HASH_TO_SCREEN).forEach(h => { SCREEN_TO_HASH[HASH_TO_SCREEN[h]] = h; });
 
   function show(screenId) {
     screens.forEach(s => s.classList.toggle("active", s.id === screenId));
     tabs.forEach(t => t.classList.toggle("active", t.dataset.screen === screenId));
+    if (screenId === "screen-quiz") renderResumeQuiz();
+    if (screenId === "screen-flash") renderResumeFlash();
     if (screenId === "screen-progress") renderProgress();
     if (screenId === "screen-fiches") renderFiches();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  tabs.forEach(t => t.addEventListener("click", () => show(t.dataset.screen)));
+  function navigate(screenId) {
+    const hash = SCREEN_TO_HASH[screenId] || "#quiz";
+    if (location.hash === hash) show(screenId);
+    else location.hash = hash; // déclenche hashchange → show()
+  }
+
+  function showFromHash() {
+    show(HASH_TO_SCREEN[location.hash] || "screen-quiz");
+  }
+
+  window.addEventListener("hashchange", showFromHash);
+  tabs.forEach(t => t.addEventListener("click", () => navigate(t.dataset.screen)));
+
+  // Le logo / titre ramène à l'accueil (sélection de thématique du quiz)
+  document.getElementById("btn-brand-home").addEventListener("click", () => {
+    goQuizHome();
+    navigate("screen-quiz");
+  });
 
   // ---------- Mode Quiz ----------
   const QUIZ_LENGTH = 10;
@@ -218,9 +248,36 @@
   document.getElementById("btn-quiz-next").addEventListener("click", nextQuizQuestion);
   document.getElementById("btn-quiz-replay").addEventListener("click", startQuiz);
   document.getElementById("btn-quiz-home").addEventListener("click", () => {
+    quizSession = null;
+    goQuizHome();
+  });
+
+  // Quitter le quiz en cours sans le perdre (bouton Accueil dans la partie)
+  document.getElementById("btn-quiz-quit").addEventListener("click", goQuizHome);
+  // Reprendre la partie là où on l'avait laissée
+  document.getElementById("btn-resume-quiz").addEventListener("click", () => {
+    // On réaffiche la partie telle quelle (la question en cours est intacte)
+    elQuizHome.hidden = true;
+    elQuizEnd.hidden = true;
+    elQuizPlay.hidden = false;
+  });
+
+  function goQuizHome() {
+    elQuizPlay.hidden = true;
     elQuizEnd.hidden = true;
     elQuizHome.hidden = false;
-  });
+    renderResumeQuiz();
+  }
+
+  function renderResumeQuiz() {
+    const btn = document.getElementById("btn-resume-quiz");
+    const active = quizSession && !quizSession.finished;
+    btn.hidden = !active;
+    if (active) {
+      btn.textContent = "▶️ Reprendre le quiz en cours (question " +
+        (quizSession.index + 1) + " / " + quizSession.questions.length + ")";
+    }
+  }
 
   function startQuiz() {
     const pool = questionsFor(quizTheme);
@@ -308,6 +365,7 @@
   }
 
   function endQuiz() {
+    quizSession.finished = true;
     elQuizPlay.hidden = true;
     elQuizEnd.hidden = false;
     const s = quizSession.score, n = quizSession.questions.length;
@@ -344,10 +402,33 @@
   document.getElementById("btn-flash-ok").addEventListener("click", () => answerFlash(true));
   document.getElementById("btn-flash-replay").addEventListener("click", startFlash);
   document.getElementById("btn-flash-home").addEventListener("click", () => {
+    flashSession = null;
+    goFlashHome();
+  });
+  document.getElementById("btn-flash-quit").addEventListener("click", goFlashHome);
+  document.getElementById("btn-resume-flash").addEventListener("click", () => {
+    elFlashHome.hidden = true;
     elFlashEnd.hidden = true;
-    elFlashHome.hidden = false;
+    elFlashPlay.hidden = false;
   });
   elCard.addEventListener("click", () => elCard.classList.toggle("flipped"));
+
+  function goFlashHome() {
+    elFlashPlay.hidden = true;
+    elFlashEnd.hidden = true;
+    elFlashHome.hidden = false;
+    renderResumeFlash();
+  }
+
+  function renderResumeFlash() {
+    const btn = document.getElementById("btn-resume-flash");
+    const active = flashSession && !flashSession.finished;
+    btn.hidden = !active;
+    if (active) {
+      btn.textContent = "▶️ Reprendre la session (carte " +
+        (flashSession.index + 1) + " / " + flashSession.cards.length + ")";
+    }
+  }
 
   function startFlash() {
     const pool = flashcardsFor(flashTheme);
@@ -383,6 +464,7 @@
     if (flashSession.index < flashSession.cards.length) {
       renderFlashcard();
     } else {
+      flashSession.finished = true;
       elFlashPlay.hidden = true;
       elFlashEnd.hidden = false;
       document.getElementById("flash-end-score").textContent =
@@ -507,5 +589,8 @@
   renderQuizThemes();
   renderFlashThemes();
   renderFicheThemes();
-  show("screen-quiz");
+  if (!HASH_TO_SCREEN[location.hash]) {
+    try { history.replaceState(null, "", "#quiz"); } catch (e) { /* file:// */ }
+  }
+  showFromHash();
 })();

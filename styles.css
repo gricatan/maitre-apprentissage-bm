@@ -41,7 +41,32 @@ body {
   padding: 24px 20px 8px;
 }
 
-.brand { display: flex; align-items: center; gap: 14px; }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.brand:hover h1 { color: var(--primary-dark); }
+
+.btn-mini {
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--bg-soft);
+  color: var(--ink-soft);
+  border: none;
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.btn-mini:hover { background: #fdeedd; color: var(--primary-dark); }
 .brand-emoji { font-size: 2.6rem; }
 .brand h1 { margin: 0; font-size: 1.45rem; }
 .subtitle { margin: 2px 0 0; color: var(--ink-soft); font-size: 0.9rem; }
