@@ -13,6 +13,27 @@
   "use strict";
 
   const MODULES = (window.MODULES || []).slice();
+
+  // Diagnostic : si des fichiers de données n'ont pas pu être chargés
+  // (dossier data/ absent ou mal placé sur l'hébergement), on l'affiche
+  // clairement au lieu de laisser la liste des thématiques vide.
+  const missing = window.DATA_ERRORS || [];
+  if (MODULES.length === 0 || missing.length > 0) {
+    const warn = document.createElement("div");
+    warn.className = "panel data-error";
+    warn.innerHTML =
+      "<h2>⚠️ Fichiers de données introuvables</h2>" +
+      "<p>L'application n'a pas pu charger " +
+      (MODULES.length === 0 ? "les thématiques" : "certaines thématiques") + ".</p>" +
+      (missing.length ? "<p>Fichiers manquants :</p><ul>" +
+        missing.map(f => "<li><code>" + f + "</code></li>").join("") + "</ul>" : "") +
+      "<p>Vérifiez que le dossier <code>data/</code> (avec ses 6 fichiers <code>.js</code>) " +
+      "est bien uploadé <strong>au même endroit que <code>index.html</code></strong> " +
+      "(dans <code>htdocs/</code> sur InfinityFree), avec les noms en minuscules. " +
+      "Puis rechargez avec Ctrl+F5.</p>";
+    document.querySelector("main").prepend(warn);
+    if (MODULES.length === 0) return;
+  }
   const ALL_QUESTIONS = MODULES.flatMap(m => m.questions);
   const ALL_FLASHCARDS = MODULES.flatMap(m => m.flashcards);
 

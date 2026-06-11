@@ -123,6 +123,18 @@ main { max-width: 880px; margin: 0 auto; padding: 16px 20px 40px; }
 
 .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 
+/* ---------- Alerte fichiers de données manquants ---------- */
+.data-error {
+  border-left: 6px solid var(--bad);
+  background: var(--bad-bg);
+}
+.data-error code {
+  background: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.88em;
+}
+
 /* ---------- Sélecteur de thématiques ---------- */
 .choose-title { margin: 22px 0 10px; font-size: 1.02rem; }
 

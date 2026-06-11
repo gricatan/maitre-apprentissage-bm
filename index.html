@@ -172,12 +172,13 @@
     <p class="muted">Contenu : module « Recruter, accueillir et former un apprenti, un alternant » · CMA Lyon-Rhône</p>
   </footer>
 
-  <script src="data/module1-contrats.js"></script>
-  <script src="data/module2-partenaires.js"></script>
-  <script src="data/module3-financement.js"></script>
-  <script src="data/module4-conditions.js"></script>
-  <script src="data/module5-obligations.js"></script>
-  <script src="data/module6-remuneration.js"></script>
-  <script src="app.js"></script>
+  <script>window.DATA_ERRORS = [];</script>
+  <script src="data/module1-contrats.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="data/module2-partenaires.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="data/module3-financement.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="data/module4-conditions.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="data/module5-obligations.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="data/module6-remuneration.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="app.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
 </body>
 </html>
