@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎓 Quiz Apprentissage · Le financement de la formation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-emoji">🎓</span>
+      <div>
+        <h1>Le financement de l'apprentissage</h1>
+        <p class="subtitle">Brevet de Maîtrise · Recruter, accueillir et former un apprenti</p>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab" data-screen="screen-quiz">🎯 Quiz</button>
+      <button class="tab" data-screen="screen-flash">🃏 Flashcards</button>
+      <button class="tab" data-screen="screen-fiches">📚 Fiches</button>
+      <button class="tab" data-screen="screen-progress">📊 Progression</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ================= QUIZ ================= -->
+    <section id="screen-quiz" class="screen">
+
+      <div id="quiz-home" class="panel center">
+        <div class="hero-emoji">🎯</div>
+        <h2>Mode Quiz</h2>
+        <p>10 questions à choix multiples, tirées au hasard.<br>
+          Les questions que vous ratez reviennent <strong>plus souvent</strong>,
+          celles que vous maîtrisez se font plus rares : c'est la
+          <em>répétition espacée</em>, la méthode la plus efficace pour mémoriser.</p>
+        <button id="btn-start-quiz" class="btn-primary">🚀 Lancer un quiz</button>
+      </div>
+
+      <div id="quiz-play" class="panel" hidden>
+        <div class="quiz-meta">
+          <span id="quiz-counter" class="pill">Question 1 / 10</span>
+          <span id="quiz-theme" class="pill pill-theme"></span>
+          <span id="quiz-score" class="pill pill-score">⭐ 0</span>
+        </div>
+        <div class="progressbar"><div id="quiz-progressbar-fill" class="progressbar-fill"></div></div>
+        <h2 id="quiz-question" class="question"></h2>
+        <div id="quiz-options" class="options"></div>
+        <div id="quiz-feedback" class="feedback" hidden></div>
+        <button id="btn-quiz-next" class="btn-primary" hidden>Question suivante ➜</button>
+      </div>
+
+      <div id="quiz-end" class="panel center" hidden>
+        <div id="quiz-end-emoji" class="hero-emoji">🏆</div>
+        <h2>Quiz terminé !</h2>
+        <p class="bigscore" id="quiz-end-score">0 / 10</p>
+        <p id="quiz-end-msg"></p>
+        <div class="btn-row">
+          <button id="btn-quiz-replay" class="btn-primary">🔁 Rejouer</button>
+          <button id="btn-quiz-home" class="btn-ghost">Retour</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= FLASHCARDS ================= -->
+    <section id="screen-flash" class="screen">
+
+      <div id="flash-home" class="panel center">
+        <div class="hero-emoji">🃏</div>
+        <h2>Mode Flashcards</h2>
+        <p>8 cartes recto-verso, façon <strong>boîtes de Leitner</strong> :
+          lisez la question, cherchez la réponse de mémoire, puis retournez la carte.<br>
+          Soyez honnête : une carte « à revoir » reviendra plus souvent !</p>
+        <button id="btn-start-flash" class="btn-primary">🃏 Lancer une session</button>
+      </div>
+
+      <div id="flash-play" class="panel center" hidden>
+        <div class="quiz-meta">
+          <span id="flash-counter" class="pill">Carte 1 / 8</span>
+          <span id="flash-box" class="pill pill-theme">Boîte 1</span>
+        </div>
+        <div id="flashcard" class="flashcard" title="Cliquez pour retourner la carte">
+          <div class="flashcard-inner">
+            <div class="flashcard-face flashcard-front">
+              <span class="flash-hint">QUESTION · cliquez pour retourner</span>
+              <p id="flash-recto"></p>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <span class="flash-hint">RÉPONSE</span>
+              <p id="flash-verso"></p>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button id="btn-flash-ko" class="btn-ko">❌ À revoir</button>
+          <button id="btn-flash-ok" class="btn-ok">✅ Je savais</button>
+        </div>
+      </div>
+
+      <div id="flash-end" class="panel center" hidden>
+        <div class="hero-emoji">📦</div>
+        <h2>Session terminée !</h2>
+        <p class="bigscore" id="flash-end-score"></p>
+        <p id="flash-end-msg"></p>
+        <div class="btn-row">
+          <button id="btn-flash-replay" class="btn-primary">🔁 Nouvelle session</button>
+          <button id="btn-flash-home" class="btn-ghost">Retour</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= FICHES ================= -->
+    <section id="screen-fiches" class="screen">
+      <div class="panel">
+        <h2>📚 Fiches de révision</h2>
+        <p class="muted">Relisez, puis <strong>testez-vous</strong> : se tester est plus efficace que relire
+          (60 % de rétention contre 40 %, expérience de Roediger &amp; Karpicke).</p>
+      </div>
+      <div id="fiches-list" class="fiches-grid"></div>
+    </section>
+
+    <!-- ================= PROGRESSION ================= -->
+    <section id="screen-progress" class="screen">
+      <div class="panel">
+        <h2>📊 Ma progression</h2>
+        <p class="muted">Sauvegardée automatiquement dans les cookies de votre navigateur.</p>
+
+        <div class="stats-grid">
+          <div class="stat"><span class="stat-value" id="stat-mastery">0 %</span><span class="stat-label">Maîtrise globale</span></div>
+          <div class="stat"><span class="stat-value" id="stat-seen">0 / 0</span><span class="stat-label">Cartes &amp; questions vues</span></div>
+          <div class="stat"><span class="stat-value" id="stat-rate">—</span><span class="stat-label">Taux de réussite</span></div>
+          <div class="stat"><span class="stat-value" id="stat-streak">0</span><span class="stat-label">Meilleure série 🔥</span></div>
+        </div>
+
+        <h3>Maîtrise globale</h3>
+        <div class="progressbar big"><div id="mastery-fill" class="progressbar-fill"></div></div>
+
+        <h3>Boîtes de Leitner</h3>
+        <p class="muted">Chaque bonne réponse fait monter d'une boîte ; une erreur ramène en boîte 1.
+          Plus la boîte est basse, plus la question revient souvent.</p>
+        <div id="boxes-chart" class="boxes-chart"></div>
+
+        <button id="btn-reset" class="btn-danger">🗑️ Réinitialiser ma progression</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Conçue selon les principes des sciences cognitives : pratique de récupération,
+      répétition espacée (Leitner), feedback immédiat et bienveillant. 🧠</p>
+    <p class="muted">Contenu : Activité 3 — Le financement de la formation en apprentissage · CMA Lyon-Rhône</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
