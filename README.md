@@ -45,6 +45,14 @@ ou tout le programme avec « 🎲 Tout mélanger ».
 La progression est enregistrée dans les **cookies** du navigateur (avec secours
 `localStorage`), conservée 1 an. Aucune donnée ne quitte votre machine.
 
+## 🔍 Page de relecture `/test`
+
+La page `/test/` (fichier `test/index.html`) permet à l'auteur de **relire toutes les
+questions et flashcards** : la bonne réponse est surlignée, l'explication affichée.
+Un clic sur « Marquer comme validée » enregistre la validation **dans les cookies**
+(clé séparée de la progression d'apprentissage). Filtre par thématique et mode
+« n'afficher que le restant à vérifier » inclus.
+
 ## 📂 Structure
 
 - `index.html` — structure de la page

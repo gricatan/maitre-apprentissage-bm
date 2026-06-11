@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Vérification des questions · Quiz Apprentissage</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    /* Styles propres à la page de vérification */
+    .test-item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 24px;
+      margin-top: 14px;
+      border-left: 6px solid #d8d2c8;
+    }
+    .test-item.validated { border-left-color: var(--good); background: #fbfff9; }
+    .test-item-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .test-id {
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      background: var(--bg-soft);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .test-question { font-size: 1.05rem; font-weight: 700; margin: 6px 0 10px; }
+    .test-options { display: grid; gap: 6px; margin-bottom: 10px; }
+    .test-option {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: var(--bg-soft);
+      font-size: 0.93rem;
+    }
+    .test-option.is-answer {
+      background: var(--good-bg);
+      border: 1.5px solid var(--good);
+      font-weight: 700;
+    }
+    .test-explication {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      background: #fdf6ec;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .test-verso {
+      font-size: 0.95rem;
+      background: #e3f4f1;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .btn-validate {
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: 2px solid var(--good);
+      color: var(--good);
+      background: transparent;
+      border-radius: 999px;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, transform 0.12s;
+    }
+    .btn-validate:hover { transform: translateY(-1px); }
+    .test-item.validated .btn-validate { background: var(--good); color: #fff; }
+    .test-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .test-toolbar label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 4px;
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .section-title {
+      margin: 24px 0 4px;
+      font-size: 1rem;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-emoji">🔍</span>
+      <div>
+        <h1>Vérification des questions</h1>
+        <p class="subtitle">Relisez chaque question et marquez-la comme validée (sauvegardé dans les cookies)</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="panel">
+      <a class="back-link" href="../index.html">← Retour à l'application</a>
+      <div class="stats-grid">
+        <div class="stat"><span class="stat-value" id="stat-validated">0 / 0</span><span class="stat-label">Éléments validés</span></div>
+        <div class="stat"><span class="stat-value" id="stat-pct">0 %</span><span class="stat-label">Avancement de la relecture</span></div>
+      </div>
+      <div class="progressbar big"><div id="validate-fill" class="progressbar-fill"></div></div>
+
+      <h3 class="choose-title">Filtrer par thématique :</h3>
+      <div id="test-themes" class="theme-grid"></div>
+
+      <div class="test-toolbar">
+        <label><input type="checkbox" id="only-pending"> N'afficher que les éléments restant à vérifier</label>
+        <button id="btn-reset-validation" class="btn-danger" style="margin:0">🗑️ Réinitialiser la relecture</button>
+      </div>
+    </div>
+
+    <div id="test-list"></div>
+  </main>
+
+  <footer>
+    <p class="muted">Page de relecture réservée à l'auteur — la progression de validation est indépendante de la progression d'apprentissage.</p>
+  </footer>
+
+  <script>window.DATA_ERRORS = [];</script>
+  <script src="../data/module1-contrats.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="../data/module2-partenaires.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="../data/module3-financement.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="../data/module4-conditions.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="../data/module5-obligations.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="../data/module6-remuneration.js" onerror="DATA_ERRORS.push(this.getAttribute('src'))"></script>
+  <script src="test.js"></script>
+</body>
+</html>
