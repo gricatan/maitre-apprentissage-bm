@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎓 Quiz Apprentissage · Le financement de la formation</title>
+  <title>🎓 Quiz Apprentissage · Brevet de Maîtrise</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,8 +12,8 @@
     <div class="brand">
       <span class="brand-emoji">🎓</span>
       <div>
-        <h1>Le financement de l'apprentissage</h1>
-        <p class="subtitle">Brevet de Maîtrise · Recruter, accueillir et former un apprenti</p>
+        <h1>Réviser le droit de l'apprentissage</h1>
+        <p class="subtitle">Brevet de Maîtrise · Recruter, accueillir et former un apprenti, un alternant</p>
       </div>
     </div>
     <nav class="tabs">
@@ -29,14 +29,20 @@
     <!-- ================= QUIZ ================= -->
     <section id="screen-quiz" class="screen">
 
-      <div id="quiz-home" class="panel center">
-        <div class="hero-emoji">🎯</div>
-        <h2>Mode Quiz</h2>
-        <p>10 questions à choix multiples, tirées au hasard.<br>
-          Les questions que vous ratez reviennent <strong>plus souvent</strong>,
-          celles que vous maîtrisez se font plus rares : c'est la
-          <em>répétition espacée</em>, la méthode la plus efficace pour mémoriser.</p>
-        <button id="btn-start-quiz" class="btn-primary">🚀 Lancer un quiz</button>
+      <div id="quiz-home" class="panel">
+        <div class="center">
+          <div class="hero-emoji">🎯</div>
+          <h2>Mode Quiz</h2>
+          <p>Questions à choix multiples, tirées au hasard dans la thématique de votre choix.<br>
+            Les questions que vous ratez reviennent <strong>plus souvent</strong>,
+            celles que vous maîtrisez se font plus rares : c'est la
+            <em>répétition espacée</em>, la méthode la plus efficace pour mémoriser.</p>
+        </div>
+        <h3 class="choose-title">Choisissez une thématique :</h3>
+        <div id="quiz-themes" class="theme-grid"></div>
+        <div class="center">
+          <button id="btn-start-quiz" class="btn-primary">🚀 Lancer un quiz</button>
+        </div>
       </div>
 
       <div id="quiz-play" class="panel" hidden>
@@ -59,7 +65,7 @@
         <p id="quiz-end-msg"></p>
         <div class="btn-row">
           <button id="btn-quiz-replay" class="btn-primary">🔁 Rejouer</button>
-          <button id="btn-quiz-home" class="btn-ghost">Retour</button>
+          <button id="btn-quiz-home" class="btn-ghost">Changer de thématique</button>
         </div>
       </div>
 
@@ -68,13 +74,19 @@
     <!-- ================= FLASHCARDS ================= -->
     <section id="screen-flash" class="screen">
 
-      <div id="flash-home" class="panel center">
-        <div class="hero-emoji">🃏</div>
-        <h2>Mode Flashcards</h2>
-        <p>8 cartes recto-verso, façon <strong>boîtes de Leitner</strong> :
-          lisez la question, cherchez la réponse de mémoire, puis retournez la carte.<br>
-          Soyez honnête : une carte « à revoir » reviendra plus souvent !</p>
-        <button id="btn-start-flash" class="btn-primary">🃏 Lancer une session</button>
+      <div id="flash-home" class="panel">
+        <div class="center">
+          <div class="hero-emoji">🃏</div>
+          <h2>Mode Flashcards</h2>
+          <p>Cartes recto-verso, façon <strong>boîtes de Leitner</strong> :
+            lisez la question, cherchez la réponse de mémoire, puis retournez la carte.<br>
+            Soyez honnête : une carte « à revoir » reviendra plus souvent !</p>
+        </div>
+        <h3 class="choose-title">Choisissez une thématique :</h3>
+        <div id="flash-themes" class="theme-grid"></div>
+        <div class="center">
+          <button id="btn-start-flash" class="btn-primary">🃏 Lancer une session</button>
+        </div>
       </div>
 
       <div id="flash-play" class="panel center" hidden>
@@ -107,7 +119,7 @@
         <p id="flash-end-msg"></p>
         <div class="btn-row">
           <button id="btn-flash-replay" class="btn-primary">🔁 Nouvelle session</button>
-          <button id="btn-flash-home" class="btn-ghost">Retour</button>
+          <button id="btn-flash-home" class="btn-ghost">Changer de thématique</button>
         </div>
       </div>
 
@@ -119,6 +131,7 @@
         <h2>📚 Fiches de révision</h2>
         <p class="muted">Relisez, puis <strong>testez-vous</strong> : se tester est plus efficace que relire
           (60 % de rétention contre 40 %, expérience de Roediger &amp; Karpicke).</p>
+        <div id="fiches-themes" class="theme-grid"></div>
       </div>
       <div id="fiches-list" class="fiches-grid"></div>
     </section>
@@ -139,6 +152,9 @@
         <h3>Maîtrise globale</h3>
         <div class="progressbar big"><div id="mastery-fill" class="progressbar-fill"></div></div>
 
+        <h3>Maîtrise par thématique</h3>
+        <div id="modules-mastery" class="boxes-chart"></div>
+
         <h3>Boîtes de Leitner</h3>
         <p class="muted">Chaque bonne réponse fait monter d'une boîte ; une erreur ramène en boîte 1.
           Plus la boîte est basse, plus la question revient souvent.</p>
@@ -153,10 +169,15 @@
   <footer>
     <p>Conçue selon les principes des sciences cognitives : pratique de récupération,
       répétition espacée (Leitner), feedback immédiat et bienveillant. 🧠</p>
-    <p class="muted">Contenu : Activité 3 — Le financement de la formation en apprentissage · CMA Lyon-Rhône</p>
+    <p class="muted">Contenu : module « Recruter, accueillir et former un apprenti, un alternant » · CMA Lyon-Rhône</p>
   </footer>
 
-  <script src="data.js"></script>
+  <script src="data/module1-contrats.js"></script>
+  <script src="data/module2-partenaires.js"></script>
+  <script src="data/module3-financement.js"></script>
+  <script src="data/module4-conditions.js"></script>
+  <script src="data/module5-obligations.js"></script>
+  <script src="data/module6-remuneration.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

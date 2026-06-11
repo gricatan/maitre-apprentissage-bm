@@ -1,18 +1,36 @@
 /* ============================================================
-   Quiz Apprentissage — logique de l'application
+   Quiz Apprentissage — logique de l'application (v2 modulaire)
    Principes appliqués (synthèse du cours) :
    - Pratique de récupération : se tester plutôt que relire
    - Feedback immédiat et bienveillant sur l'erreur
    - Répétition espacée / boîtes de Leitner : les questions
      ratées reviennent plus souvent
    - Sessions courtes (apprentissage distribué)
+   - Thématiques choisissables ou mode « tout mélanger »
    ============================================================ */
 
 (function () {
   "use strict";
 
+  const MODULES = (window.MODULES || []).slice();
+  const ALL_QUESTIONS = MODULES.flatMap(m => m.questions);
+  const ALL_FLASHCARDS = MODULES.flatMap(m => m.flashcards);
+
+  function questionsFor(themeId) {
+    if (themeId === "all") return ALL_QUESTIONS;
+    const m = MODULES.find(m => m.id === themeId);
+    return m ? m.questions : [];
+  }
+
+  function flashcardsFor(themeId) {
+    if (themeId === "all") return ALL_FLASHCARDS;
+    const m = MODULES.find(m => m.id === themeId);
+    return m ? m.flashcards : [];
+  }
+
   // ---------- Stockage (cookies, avec secours localStorage) ----------
-  const STORE_KEY = "bm_financement_progress";
+  const STORE_KEY = "bm_apprentissage_progress";
+  const OLD_KEY = "bm_financement_progress"; // reprise de la progression v1
 
   function setCookie(name, value, days) {
     const d = new Date();
@@ -30,6 +48,19 @@
     let raw = getCookie(STORE_KEY);
     if (!raw) {
       try { raw = localStorage.getItem(STORE_KEY); } catch (e) { /* file:// ou navigation privée */ }
+    }
+    if (!raw) {
+      // Migration depuis la v1 : les ids q1/f1 deviennent m3q1/m3f1
+      let old = getCookie(OLD_KEY);
+      if (!old) { try { old = localStorage.getItem(OLD_KEY); } catch (e) { /* ignore */ } }
+      if (old) {
+        try {
+          const p = JSON.parse(old);
+          const items = {};
+          Object.keys(p.items || {}).forEach(k => { items["m3" + k] = p.items[k]; });
+          return { items, totalOk: p.totalOk || 0, totalKo: p.totalKo || 0, bestStreak: p.bestStreak || 0 };
+        } catch (e) { /* données corrompues */ }
+      }
     }
     if (raw) {
       try { return JSON.parse(raw); } catch (e) { /* données corrompues : repartir à zéro */ }
@@ -75,7 +106,7 @@
     saveProgress();
   }
 
-  // Tirage aléatoire pondéré, sans remise, en évitant les répétitions immédiates
+  // Tirage aléatoire pondéré, sans remise
   function weightedSample(pool, count) {
     const candidates = pool.slice();
     const picked = [];
@@ -101,6 +132,37 @@
     return a;
   }
 
+  function masteryOf(id) {
+    const it = getItem(id);
+    if (!it) return 0;
+    return (it.b - 1) / 4; // boîte 1 → 0 %, boîte 5 → 100 %
+  }
+
+  function moduleMastery(m) {
+    const items = m.questions.concat(m.flashcards);
+    if (!items.length) return 0;
+    return items.reduce((s, x) => s + masteryOf(x.id), 0) / items.length;
+  }
+
+  // ---------- Sélecteur de thématique (chips) ----------
+  function renderThemeChips(containerId, current, onSelect, countOf) {
+    const box = document.getElementById(containerId);
+    box.innerHTML = "";
+
+    const mkChip = (id, emoji, label, count) => {
+      const btn = document.createElement("button");
+      btn.className = "theme-chip" + (current === id ? " selected" : "");
+      btn.innerHTML = "<span class='chip-emoji'>" + emoji + "</span>" +
+        "<span class='chip-label'>" + label + "</span>" +
+        "<span class='chip-count'>" + count + "</span>";
+      btn.addEventListener("click", () => onSelect(id));
+      box.appendChild(btn);
+    };
+
+    mkChip("all", "🎲", "Tout mélanger", countOf("all"));
+    MODULES.forEach(m => mkChip(m.id, m.emoji, m.titre, countOf(m.id)));
+  }
+
   // ---------- Navigation entre les modes ----------
   const screens = document.querySelectorAll(".screen");
   const tabs = document.querySelectorAll(".tab");
@@ -117,11 +179,19 @@
 
   // ---------- Mode Quiz ----------
   const QUIZ_LENGTH = 10;
+  let quizTheme = "all";
   let quizSession = null;
 
   const elQuizHome = document.getElementById("quiz-home");
   const elQuizPlay = document.getElementById("quiz-play");
   const elQuizEnd = document.getElementById("quiz-end");
+
+  function renderQuizThemes() {
+    renderThemeChips("quiz-themes", quizTheme, id => {
+      quizTheme = id;
+      renderQuizThemes();
+    }, id => questionsFor(id).length + " questions");
+  }
 
   document.getElementById("btn-start-quiz").addEventListener("click", startQuiz);
   document.getElementById("btn-quiz-next").addEventListener("click", nextQuizQuestion);
@@ -132,8 +202,10 @@
   });
 
   function startQuiz() {
+    const pool = questionsFor(quizTheme);
+    if (!pool.length) return;
     quizSession = {
-      questions: weightedSample(QUIZ_QUESTIONS, QUIZ_LENGTH),
+      questions: weightedSample(pool, Math.min(QUIZ_LENGTH, pool.length)),
       index: 0,
       score: 0,
       streak: 0
@@ -221,22 +293,30 @@
     const pct = Math.round(s / n * 100);
     document.getElementById("quiz-end-score").textContent = s + " / " + n;
     let msg, emoji;
-    if (pct === 100) { emoji = "🏆"; msg = "Sans faute, le financement n'a plus de secret pour vous !"; }
+    if (pct === 100) { emoji = "🏆"; msg = "Sans faute, ce thème n'a plus de secret pour vous !"; }
     else if (pct >= 70) { emoji = "🌟"; msg = "Très belle session ! Les questions ratées reviendront bientôt pour s'ancrer."; }
     else if (pct >= 40) { emoji = "💪"; msg = "Bon entraînement ! L'erreur est un levier de progression : ces questions reviendront plus souvent."; }
-    else { emoji = "🌱"; msg = "C'est en se testant qu'on mémorise. Relisez les fiches puis relancez un quiz court !"; }
+    else { emoji = "🌱"; msg = "C'est en se testant qu'on mémorise. Relisez les fiches de ce thème puis relancez un quiz court !"; }
     document.getElementById("quiz-end-emoji").textContent = emoji;
     document.getElementById("quiz-end-msg").textContent = msg;
   }
 
   // ---------- Mode Flashcards ----------
   const FLASH_LENGTH = 8;
+  let flashTheme = "all";
   let flashSession = null;
 
   const elFlashHome = document.getElementById("flash-home");
   const elFlashPlay = document.getElementById("flash-play");
   const elFlashEnd = document.getElementById("flash-end");
   const elCard = document.getElementById("flashcard");
+
+  function renderFlashThemes() {
+    renderThemeChips("flash-themes", flashTheme, id => {
+      flashTheme = id;
+      renderFlashThemes();
+    }, id => flashcardsFor(id).length + " cartes");
+  }
 
   document.getElementById("btn-start-flash").addEventListener("click", startFlash);
   document.getElementById("btn-flash-ko").addEventListener("click", () => answerFlash(false));
@@ -249,8 +329,10 @@
   elCard.addEventListener("click", () => elCard.classList.toggle("flipped"));
 
   function startFlash() {
+    const pool = flashcardsFor(flashTheme);
+    if (!pool.length) return;
     flashSession = {
-      cards: weightedSample(FLASHCARDS, FLASH_LENGTH),
+      cards: weightedSample(pool, Math.min(FLASH_LENGTH, pool.length)),
       index: 0,
       known: 0
     };
@@ -292,45 +374,60 @@
   }
 
   // ---------- Mode Fiches ----------
-  let fichesRendered = false;
+  let ficheTheme = "all";
+
+  function renderFicheThemes() {
+    renderThemeChips("fiches-themes", ficheTheme, id => {
+      ficheTheme = id;
+      renderFicheThemes();
+      renderFiches();
+    }, id => {
+      if (id === "all") return MODULES.reduce((s, m) => s + m.fiches.length, 0) + " fiches";
+      const m = MODULES.find(m => m.id === id);
+      return (m ? m.fiches.length : 0) + " fiches";
+    });
+  }
+
   function renderFiches() {
-    if (fichesRendered) return;
-    fichesRendered = true;
     const wrap = document.getElementById("fiches-list");
-    FICHES.forEach(f => {
-      const card = document.createElement("article");
-      card.className = "fiche fiche-" + f.couleur;
-      let html = "<h3>" + f.titre + "</h3>";
-      if (f.contenu) {
-        f.contenu.forEach(c => {
-          html += "<div class='fiche-bloc'><h4>" + c.sous + "</h4><p>" + c.texte + "</p></div>";
-        });
+    wrap.innerHTML = "";
+    MODULES.forEach(m => {
+      if (ficheTheme !== "all" && m.id !== ficheTheme) return;
+      if (ficheTheme === "all") {
+        const header = document.createElement("h3");
+        header.className = "module-header";
+        header.textContent = m.emoji + " " + m.titre;
+        wrap.appendChild(header);
       }
-      if (f.table) {
-        html += "<div class='table-scroll'><table><thead><tr>";
-        f.table.entetes.forEach(e => html += "<th>" + e + "</th>");
-        html += "</tr></thead><tbody>";
-        f.table.lignes.forEach(l => {
-          html += "<tr>";
-          l.forEach(cell => html += "<td>" + cell + "</td>");
-          html += "</tr>";
-        });
-        html += "</tbody></table></div>";
-      }
-      card.innerHTML = html;
-      wrap.appendChild(card);
+      m.fiches.forEach(f => {
+        const card = document.createElement("article");
+        card.className = "fiche fiche-" + f.couleur;
+        let html = "<h3>" + f.titre + "</h3>";
+        if (f.contenu) {
+          f.contenu.forEach(c => {
+            html += "<div class='fiche-bloc'><h4>" + c.sous + "</h4><p>" + c.texte + "</p></div>";
+          });
+        }
+        if (f.table) {
+          html += "<div class='table-scroll'><table><thead><tr>";
+          f.table.entetes.forEach(e => html += "<th>" + e + "</th>");
+          html += "</tr></thead><tbody>";
+          f.table.lignes.forEach(l => {
+            html += "<tr>";
+            l.forEach(cell => html += "<td>" + cell + "</td>");
+            html += "</tr>";
+          });
+          html += "</tbody></table></div>";
+        }
+        card.innerHTML = html;
+        wrap.appendChild(card);
+      });
     });
   }
 
   // ---------- Progression ----------
-  function masteryOf(id) {
-    const it = getItem(id);
-    if (!it) return 0;
-    return (it.b - 1) / 4; // boîte 1 → 0 %, boîte 5 → 100 %
-  }
-
   function renderProgress() {
-    const all = QUIZ_QUESTIONS.concat(FLASHCARDS);
+    const all = ALL_QUESTIONS.concat(ALL_FLASHCARDS);
     const seen = all.filter(x => getItem(x.id));
     const mastery = all.reduce((s, x) => s + masteryOf(x.id), 0) / all.length;
 
@@ -341,6 +438,20 @@
       total ? Math.round(progress.totalOk / total * 100) + " %" : "—";
     document.getElementById("stat-streak").textContent = progress.bestStreak;
     document.getElementById("mastery-fill").style.width = Math.round(mastery * 100) + "%";
+
+    // Maîtrise par thématique
+    const modEl = document.getElementById("modules-mastery");
+    modEl.innerHTML = "";
+    MODULES.forEach(m => {
+      const pct = Math.round(moduleMastery(m) * 100);
+      const row = document.createElement("div");
+      row.className = "box-row";
+      row.innerHTML =
+        "<span class='box-label'>" + m.emoji + " " + m.titre + "</span>" +
+        "<span class='box-bar'><span class='box-bar-fill module-fill' style='width:" + pct + "%'></span></span>" +
+        "<span class='box-count'>" + pct + " %</span>";
+      modEl.appendChild(row);
+    });
 
     // Répartition par boîte de Leitner
     const counts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -372,5 +483,8 @@
   });
 
   // ---------- Démarrage ----------
+  renderQuizThemes();
+  renderFlashThemes();
+  renderFicheThemes();
   show("screen-quiz");
 })();

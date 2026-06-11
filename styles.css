@@ -123,6 +123,54 @@ main { max-width: 880px; margin: 0 auto; padding: 16px 20px 40px; }
 
 .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 
+/* ---------- Sélecteur de thématiques ---------- */
+.choose-title { margin: 22px 0 10px; font-size: 1.02rem; }
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+  margin: 12px 0 20px;
+}
+
+.theme-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: var(--bg-soft);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: transform 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.theme-chip:hover { transform: translateY(-2px); border-color: var(--primary); }
+
+.theme-chip.selected {
+  background: #fdeedd;
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(232, 150, 90, 0.25);
+}
+
+.chip-emoji { font-size: 1.5rem; }
+.chip-label { font-weight: 700; flex: 1; line-height: 1.25; }
+.chip-count { font-size: 0.75rem; color: var(--ink-soft); white-space: nowrap; }
+
+.module-header {
+  grid-column: 1 / -1;
+  margin: 18px 0 0;
+  font-size: 1.15rem;
+  color: var(--primary-dark);
+  border-bottom: 2px dashed #f3d9bd;
+  padding-bottom: 6px;
+}
+
+.module-fill { background: linear-gradient(90deg, var(--accent), var(--primary)); }
+
 /* ---------- Quiz ---------- */
 .quiz-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 

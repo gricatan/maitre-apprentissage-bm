@@ -1,21 +1,33 @@
-# 🎓 Quiz Apprentissage — Le financement de la formation en apprentissage
+# 🎓 Quiz Apprentissage — Réviser le droit de l'apprentissage
 
-Application web pédagogique et ludique pour réviser le **financement de la formation en
-apprentissage** (Brevet de Maîtrise, bloc « Recruter, accueillir et former un apprenti, un alternant »).
+Application web pédagogique et ludique pour réviser le bloc **« Recruter, accueillir et
+former un apprenti, un alternant »** du Brevet de Maîtrise (CMA Lyon-Rhône).
 
 ## 🚀 Utilisation
 
 Aucune installation : ouvrez simplement `index.html` dans un navigateur,
-ou hébergez le dossier tel quel (GitHub Pages, etc.).
+ou hébergez le dossier tel quel (InfinityFree, GitHub Pages, etc. — site 100 % statique).
 
 ## 🧩 Les 4 modes
 
 | Mode | Description |
 |---|---|
-| 🎯 **Quiz** | Sessions de 10 QCM tirés au hasard, feedback immédiat et explication à chaque réponse |
+| 🎯 **Quiz** | Sessions de 10 QCM max, feedback immédiat et explication à chaque réponse |
 | 🃏 **Flashcards** | Cartes recto-verso à retourner, auto-évaluation « Je savais / À revoir » |
-| 📚 **Fiches** | Fiches de révision synthétiques + tableau récapitulatif des 5 cas pratiques |
-| 📊 **Progression** | Maîtrise globale, taux de réussite, répartition par boîte de Leitner, remise à zéro |
+| 📚 **Fiches** | Fiches de révision synthétiques + tableaux récapitulatifs des cas pratiques |
+| 📊 **Progression** | Maîtrise globale et par thématique, taux de réussite, boîtes de Leitner, remise à zéro |
+
+Chaque mode propose un **sélecteur de thématique** : on révise un module précis,
+ou tout le programme avec « 🎲 Tout mélanger ».
+
+## 📖 Les 6 thématiques
+
+1. 📝 Apprentissage, professionnalisation ou stage ? (+ diplômes, histoire)
+2. 🤝 Les partenaires de l'apprentissage (CMA, OPCO, CFA, DREETS…)
+3. 💶 Le financement de la formation (NPEC, participation employeur, reste à charge)
+4. ✍️ Les conditions du contrat (âge, maître d'apprentissage, forme, durée)
+5. ⚖️ Obligations et missions des acteurs (employeur / CFA / apprenti)
+6. 💰 Rémunération et aides à l'embauche (% SMIC, aide unique, aide exceptionnelle)
 
 ## 🧠 Principes pédagogiques appliqués (issus de la synthèse du cours)
 
@@ -37,5 +49,8 @@ La progression est enregistrée dans les **cookies** du navigateur (avec secours
 
 - `index.html` — structure de la page
 - `styles.css` — thème clair (tons pastel chauds)
-- `data.js` — questions QCM, flashcards et fiches (contenu de l'Activité 3)
-- `app.js` — logique : tirage pondéré, système Leitner, stockage cookies
+- `data/module*.js` — un fichier de données par thématique (questions, flashcards, fiches)
+- `app.js` — logique : sélection de thématique, tirage pondéré, système Leitner, stockage cookies
+
+Pour ajouter une thématique : créer `data/module7-xxx.js` sur le modèle des autres
+(`window.MODULES.push({...})`) et ajouter la balise `<script>` correspondante dans `index.html`.
